@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delhi air at Diwali: crackers or crop fires?</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --s-pm:#3987e5; --s-fire:#d95926; --s-path:#199e70; --s-wind:#c98500; --diwali:#d55181;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1{font-size:18px;margin:0;font-weight:650}
+h2{font-size:16px;margin:0 0 8px}
+h3{font-size:12px;margin:0 0 6px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+p{margin:0 0 8px}
+.top{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 16px;flex-wrap:wrap}
+.sub{color:var(--ink2);margin:2px 0 0;font-size:13px}
+.years{display:flex;gap:4px}
+button,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--s-pm);outline-offset:2px}
+button[aria-pressed=true],button[aria-selected=true]{background:var(--ink);color:#0b0b0b;border-color:var(--ink)}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:8px;padding:0 16px;height:min(60vh,620px);min-height:420px}
+.mapwrap{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--ring);background:var(--surface)}
+#map{position:absolute;inset:0;background:#111}
+.mapwrap canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:500}
+.leaflet-container{font:inherit}
+#tip,#ttip{position:absolute;z-index:900;pointer-events:none;background:#000d;border:1px solid var(--axis);border-radius:6px;padding:4px 8px;font-size:12px;display:none;white-space:nowrap}
+#loading{position:absolute;inset:0;z-index:950;display:grid;place-items:center;background:#0d0d0dcc;font-size:15px}
+.legend{position:absolute;left:10px;bottom:26px;z-index:800;background:#111d;border:1px solid var(--ring);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink2);width:250px}
+.ramp{height:10px;border-radius:3px;margin:4px 0 2px}
+.ramplab{position:relative;height:13px}
+.ramplab span{position:absolute;transform:translateX(-50%)}
+.keys{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:6px}
+.keys i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.panel{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:8px;padding:10px 12px}
+.clock{font-size:17px;font-weight:650}
+.rel{color:var(--ink2);font-size:13px}
+.big{font-size:44px;font-weight:650;line-height:1.05}
+.big small{font-size:13px;color:var(--muted);font-weight:400;margin-left:4px}
+.chip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;color:#0b0b0b}
+.meter{position:relative;height:10px;border-radius:5px;margin:10px 0 4px}
+.meter b{position:absolute;top:-4px;width:4px;height:18px;margin-left:-2px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 2px var(--surface)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:13px;color:var(--ink2)}
+.kv span{white-space:nowrap}
+.kv b{color:var(--ink);font-weight:600;text-align:right}
+.windrow{display:flex;gap:12px;align-items:center}
+#arrow{width:46px;height:46px;flex:none}
+.toggles{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:13px}
+.toggles label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.tl{margin:8px 16px 0;position:relative}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.ctl .sp{flex:1}
+#range{width:100%;margin:0;accent-color:var(--ink)}
+#tlc{width:100%;display:block;cursor:ew-resize;touch-action:none}
+.find{padding:20px 16px 40px;max-width:1180px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;margin-bottom:16px}
+.cards .card p{color:var(--ink2);margin:0}
+.cards .card strong{color:var(--ink)}
+code{background:#000;border:1px solid var(--axis);border-radius:4px;padding:0 4px;font-size:12px}
+.num{font-size:26px;font-weight:650;margin:2px 0 4px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0 18px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--grid);text-align:right;font-variant-numeric:tabular-nums}
+th{color:var(--muted);font-weight:600;font-size:12px;vertical-align:bottom}
+th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto}
+.note{color:var(--ink2);font-size:13px;max-width:900px}
+.note li{margin-bottom:4px}
+a{color:#86b6ef}
+@media (max-width:900px){.app{grid-template-columns:1fr;height:auto}.mapwrap{height:56vh;min-height:360px}.legend{width:190px;bottom:48px}.legend .keys{display:none}.tl{overflow:hidden}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Delhi air at Diwali: crackers or crop fires?</h1>
+    <p class="sub">NASA fire detections, wind, and ground PM2.5 meters on one timeline. 1 Oct to 30 Nov. All times IST.</p>
+  </div>
+  <div class="years" id="years" role="tablist" aria-label="Year"></div>
+</header>
+
+<main class="app">
+  <section class="mapwrap" aria-label="Map of north India with fires, wind and PM2.5">
+    <div id="map"></div>
+    <canvas id="cv"></canvas>
+    <canvas id="wcv"></canvas>
+    <div id="tip"></div>
+    <div class="legend">
+      <div>PM2.5, &micro;g/m&sup3; (heat = CAMS model, rings = ground meters)</div>
+      <div class="ramp" id="ramp"></div>
+      <div class="ramplab" id="ramplab"></div>
+      <div class="keys">
+        <span><i style="background:#ff8a2a"></i>fire seen in last 24 h</span>
+        <span><i style="background:#7fe0ff"></i>path of Delhi's air, last 48 h</span>
+        <span><i style="background:#fff"></i>wind (100 m)</span>
+      </div>
+    </div>
+    <div id="loading">Loading data...</div>
+  </section>
+
+  <aside class="panel">
+    <div class="card">
+      <div class="clock" id="clock">-</div>
+      <div class="rel" id="rel">-</div>
+    </div>
+    <div class="card">
+      <h3>Delhi meters now (city mean)</h3>
+      <div class="big"><span id="pm">-</span><small>&micro;g/m&sup3; PM2.5</small></div>
+      <div class="meter" id="meter"><b id="needle"></b></div>
+      <div class="kv">
+        <span title="Indian AQI from the 24 hour mean of PM2.5 only">India AQI, 24 h</span><b><span id="aqi">-</span> <span class="chip" id="cat">-</span></b>
+        <span>Worst meter</span><b id="worst">-</b>
+        <span>Meters reporting</span><b id="nst">-</b>
+        <span title="CAMS global model, not a meter">Smoke model</span><b id="model">-</b>
+      </div>
+      <p class="rel" id="srcnote" style="margin:8px 0 0;font-size:12px"></p>
+    </div>
+    <div class="card">
+      <h3>Wind at Delhi</h3>
+      <div class="windrow">
+        <svg id="arrow" viewBox="-24 -24 48 48" aria-hidden="true"><circle r="22" fill="none" stroke="#383835"/><g id="arrowg"><path d="M0 16 L0 -12 M-7 -4 L0 -14 L7 -4" fill="none" stroke="#f0efec" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        <div class="kv" style="flex:1">
+          <span>Comes from</span><b id="wfrom">-</b>
+          <span>Speed (10 m)</span><b id="wsp">-</b>
+          <span>Air lid height</span><b id="blh">-</b>
+          <span>Rain this hour</span><b id="rain">-</b>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Fires (NASA VIIRS, <span id="firesat">S-NPP</span>)</h3>
+      <div class="kv">
+        <span>Seen in map area, last 24 h</span><b id="f24">-</b>
+        <span>On the path of Delhi's air, today</span><b id="fpath">-</b>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Map layers</h3>
+      <div class="toggles" id="toggles"></div>
+    </div>
+  </aside>
+</main>
+
+<section class="tl" aria-label="Timeline">
+  <div class="ctl">
+    <button id="play" aria-label="Play or pause">&#9654; Play</button>
+    <select id="speed" aria-label="Play speed"><option value="6">Slow</option><option value="14" selected>Normal</option><option value="48">Fast</option></select>
+    <button data-jump="diwali">Go to Diwali night</button>
+    <button data-jump="fire">Go to fire peak</button>
+    <button data-jump="worst">Go to worst day</button>
+    <span class="sp"></span>
+    <span class="rel">Drag on the chart. Keys: arrows = 1 hour, Shift+arrows = 1 day, Space = play.</span>
+  </div>
+  <canvas id="tlc" tabindex="0" role="img" aria-label="Timeline charts: PM2.5, fires per day, fires on the path of Delhi's air, wind speed. The tables below give the same numbers."></canvas>
+  <div id="ttip"></div>
+  <input id="range" type="range" min="0" max="1463" step="1" value="0" aria-label="Time, in hours from 1 October">
+</section>
+
+<section class="find">
+  <h2>What the data says</h2>
+  <p class="note" id="short" style="font-size:15px;color:var(--ink);margin-bottom:12px"></p>
+  <div class="cards" id="verdict"></div>
+
+  <h2 id="yrhead">This year</h2>
+  <div class="cards" id="yearcards"></div>
+
+  <h3>All years side by side</h3>
+  <div class="scroll"><table id="cmp"></table></div>
+
+  <h3 id="tophead">The 10 worst days of the season</h3>
+  <div class="scroll"><table id="top"></table></div>
+
+  <h3>How to read this, and the limits</h3>
+  <ul class="note">
+    <li><b>Meters</b>: hourly PM2.5 from the Delhi ground stations in the OpenAQ archive (CPCB, DPCC, IMD). "City mean" is the mean of all meters that report in that hour. The hour label can be off by 1 hour, because the sources do not say if a label is the start or the end of the hour.</li>
+    <li><b>Meter sources differ by year.</b> 2025: about 40 Delhi meters, full values. 2024: 38 meters, but the source has no readings of 1000 or more, so we show those hours as 1000. 2022 and 2023: one meter only (US Embassy), with gaps. <b>Faulty readings</b>: we drop a reading when one meter is at 8 times the city median or more.</li>
+    <li><b>AQI</b>: the Indian AQI stops at 500. It uses a 24 hour mean. A number such as 1000 or 3000 is not an Indian AQI value. It is an hourly PM2.5 reading, or a number from an app that uses a different scale.</li>
+    <li><b>Fires</b>: NASA VIIRS (S-NPP satellite, 375 m). The satellite passes about 13:30 and 01:30. It does not see fires under cloud or thick smoke, and it does not see fires that start after it passes. Reports say that farmers now burn later in the day, so counts in recent years can be too low.</li>
+    <li><b>2026 uses a different fire satellite.</b> S-NPP sent no data after 2 Nov 2026. So 2026 uses NOAA-20, which has the same VIIRS instrument and passes about 50 minutes apart. Check for the 2025 season: NOAA-20 saw 24,033 fires and S-NPP saw 23,404. The season totals agree within 3%, but one day can differ a lot. The 2026 data is near real time and has no fire type, so a few factory heat sources (about 3% in 2025) are in the count. The answer cards above use full seasons only.</li>
+    <li><b>Wind</b>: ERA5 reanalysis, 100 m above ground. The last 5 days or so of a season in progress come from a weather forecast model. <b>Path of Delhi's air</b>: we walk the air backward for 48 hours with this wind. It is a simple, one-level estimate. <b>Fires on the path</b>: fires seen that day within about 40 km of the path.</li>
+    <li><b>Heat layer</b>: CAMS global model (about 45 km cells). It is a model, not a meter. It does not know about fireworks, so it does not show the Diwali night spike. This is useful: the spike that only the meters show is the cracker part.</li>
+    <li><b>NASA photo</b>: true colour picture from VIIRS for that day (about 13:30). <b>NASA haze map</b>: MODIS aerosol optical depth, which is how much dust and smoke is in the full column of air. Gaps are cloud or no pass.</li>
+    <li><b>Rank link</b>: Spearman rank correlation of the day values. +1 means the two go up together. 0 means no link. -1 means one goes down when the other goes up. Diwali day and the day after are left out.</li>
+    <li><b>Correlation is not proof.</b> Cold, still nights and many fires come at the same time of year. The numbers here show what fits the data. They do not split the blame to an exact percent.</li>
+  </ul>
+  <h3>Sources</h3>
+  <ul class="note">
+    <li>Fires: <a href="https://firms.modaps.eosdis.nasa.gov/country/">NASA FIRMS country archive</a>, VIIRS S-NPP. Daily photo: <a href="https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api">NASA GIBS</a>.</li>
+    <li>Meters: <a href="https://docs.openaq.org/aws/about">OpenAQ open data archive on AWS</a>.</li>
+    <li>Wind and model PM2.5: <a href="https://open-meteo.com/">Open-Meteo</a> (ERA5 and CAMS, Copernicus).</li>
+  </ul>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/summary.js"></script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const YEARS = [2022, 2023, 2024, 2025, 2026];
+const DELHI = [28.63, 77.22];
+const CELL = 0.25;
+// PM2.5 colour scale. Stops follow the Indian AQI bands for PM2.5 (30/60/90/120/250), then go on past "severe".
+const STOPS = [[0,[46,158,79]],[30,[143,201,58]],[60,[242,212,61]],[90,[240,140,46]],[120,[224,69,47]],[250,[142,26,43]],[500,[123,44,191]],[1000,[224,170,255]]];
+const CATS = [[30,"Good"],[60,"Satisfactory"],[90,"Moderate"],[120,"Poor"],[250,"Very poor"],[1e9,"Severe"]];
+const SCALE_MAX = 1000;
+const rampX = v => Math.sqrt(Math.min(v, SCALE_MAX) / SCALE_MAX) * 100; // sqrt, so the low bands stay visible
+
+function pmRGB(v) {
+  if (v <= 0) return STOPS[0][1];
+  for (let i = 1; i < STOPS.length; i++) {
+    if (v <= STOPS[i][0]) {
+      const [a, ca] = STOPS[i - 1], [b, cb] = STOPS[i], k = (v - a) / (b - a);
+      return [0, 1, 2].map(j => Math.round(ca[j] + (cb[j] - ca[j]) * k));
+    }
+  }
+  return STOPS[STOPS.length - 1][1];
+}
+const pmCSS = v => v == null ? "#555" : `rgb(${pmRGB(v).join(",")})`;
+const cat = v => CATS.find(c => v <= c[0])[1];
+const nf = x => x == null ? "no data" : Math.round(x).toLocaleString("en-IN");
+const DIRS = ["N","NE","E","SE","S","SW","W","NW"];
+const dirName = d => DIRS[Math.round(d / 45) % 8];
+
+let D = null, T = 0, playing = false, fireStart = null, hoverT = null;
+const layers = { heat: true, fires: true, wind: true, path: true, meters: true, photo: false, haze: false };
+const LAYER_NAMES = { heat: "PM2.5 model heat", fires: "Fires", wind: "Wind", path: "Air path (48 h)", meters: "Ground meters", photo: "NASA photo of the day", haze: "NASA haze map of the day" };
+
+// ---------- map ----------
+const map = L.map("map", { zoomAnimation: false, minZoom: 5, maxZoom: 10, zoomSnap: 0.5 }).setView([29.6, 76.2], 7);
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_";
+L.tileLayer(ESRI + "Base/MapServer/tile/{z}/{y}/{x}", { attribution: "Basemap: Esri, HERE, Garmin, &copy; OpenStreetMap" }).addTo(map);
+map.createPane("labels").style.cssText = "z-index:550;pointer-events:none"; // place names sit above the data canvases
+L.tileLayer(ESRI + "Reference/MapServer/tile/{z}/{y}/{x}", { pane: "labels" }).addTo(map);
+// NASA GIBS daily layers: [layer id, tile set, file type, max zoom, opacity]
+const GIBS = {
+  photo: ["VIIRS_SNPP_CorrectedReflectance_TrueColor", "GoogleMapsCompatible_Level9", "jpg", 9, 0.9],
+  haze: ["MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth", "GoogleMapsCompatible_Level7", "png", 7, 0.8],
+};
+// The S-NPP satellite sent no data after 2 Nov 2026. From 2026 the photo comes from NOAA-20 (same camera).
+const gibsUrl = (k, day) => `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${k === "photo" && day >= "2026" ? GIBS[k][0].replace("SNPP", "NOAA20") : GIBS[k][0]}/default/${day}/${GIBS[k][1]}/{z}/{y}/{x}.${GIBS[k][2]}`;
+const gibs = {};
+for (const k in GIBS) gibs[k] = L.tileLayer(gibsUrl(k, "2024-11-01"), { maxNativeZoom: GIBS[k][3], opacity: GIBS[k][4] });
+function syncGibs() {
+  const day = isoDay(T);
+  for (const k in GIBS) {
+    if (!layers[k]) { gibs[k].remove(); continue; }
+    if (gibs[k].day !== day) { gibs[k].day = day; gibs[k].setUrl(gibsUrl(k, day)); }
+    if (!map.hasLayer(gibs[k])) gibs[k].addTo(map);
+  }
+}
+const cv = $("#cv"), wcv = $("#wcv"), ctx = cv.getContext("2d"), wctx = wcv.getContext("2d");
+const heatCv = document.createElement("canvas"), HS = 6;
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function sizeCanvas(c) {
+  const r = c.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+  c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+  return r;
+}
+const px = (lat, lon) => map.latLngToContainerPoint([lat, lon]);
+const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+const invMerc = m => (2 * Math.atan(Math.exp(m)) - Math.PI / 2) * 180 / Math.PI;
+
+function bilinear(g, arr, t, lat, lon) {
+  const fy = (lat - g.lat0) / g.d, fx = (lon - g.lon0) / g.d;
+  if (fy < 0 || fx < 0 || fy > g.ny - 1 || fx > g.nx - 1) return null;
+  const y = Math.min(Math.floor(fy), g.ny - 2), x = Math.min(Math.floor(fx), g.nx - 2);
+  const ay = fy - y, ax = fx - x, b = t * g.ny * g.nx + y * g.nx + x;
+  return (arr[b] * (1 - ax) + arr[b + 1] * ax) * (1 - ay) + (arr[b + g.nx] * (1 - ax) + arr[b + g.nx + 1] * ax) * ay;
+}
+
+// Where was the air that is over Delhi now? Step back hour by hour with the 100 m wind. Same method as fetch_data.py.
+function backPath(t, hours = 48) {
+  let [lat, lon] = DELHI; const pts = [[lat, lon]];
+  for (let k = 0; k < hours && t - k >= 0; k++) {
+    const u = bilinear(D.wind, D.wind.u, t - k, lat, lon), v = bilinear(D.wind, D.wind.v, t - k, lat, lon);
+    if (u == null) break;
+    lat -= v / 111; lon -= u / (111 * Math.cos(lat * Math.PI / 180));
+    pts.push([lat, lon]);
+  }
+  return pts;
+}
+
+function drawHeat() {
+  const g = D.pmGrid, W = (g.nx - 1) * HS + 1, H = (g.ny - 1) * HS + 1;
+  heatCv.width = W; heatCv.height = H;
+  const hctx = heatCv.getContext("2d"), img = hctx.createImageData(W, H);
+  const latN = g.lat0 + (g.ny - 1) * g.d, lonE = g.lon0 + (g.nx - 1) * g.d, mN = mercY(latN), mS = mercY(g.lat0);
+  for (let j = 0; j < H; j++) {
+    const lat = invMerc(mN + (mS - mN) * j / (H - 1)); // rows are even in map space, so the picture lines up with the tiles
+    for (let i = 0; i < W; i++) {
+      const v = bilinear(g, g.v, T, Math.min(latN, Math.max(g.lat0, lat)), g.lon0 + i / HS * g.d) || 0;
+      const c = pmRGB(v), o = (j * W + i) * 4;
+      img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2];
+      const edge = Math.min(1, Math.min(i, W - 1 - i, j, H - 1 - j) / HS); // fade out at the border of the model area
+      img.data[o + 3] = 255 * edge * (0.12 + 0.5 * Math.min(1, v / 250));
+    }
+  }
+  hctx.putImageData(img, 0, 0);
+  const a = px(latN, g.lon0), b = px(g.lat0, lonE);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(heatCv, a.x, a.y, b.x - a.x, b.y - a.y);
+}
+
+function drawMap() {
+  if (!D) return;
+  const r = sizeCanvas(cv);
+  ctx.clearRect(0, 0, r.width, r.height);
+  if (layers.heat && D.pmGrid) drawHeat();
+  if (layers.fires) {
+    ctx.globalCompositeOperation = "lighter";
+    const F = D.fires, z = Math.max(0.6, (map.getZoom() - 4) / 3);
+    for (let i = fireStart[Math.max(0, T - 23)]; i < fireStart[T + 1]; i++) {
+      const p = px(F[i * 4 + 1] / 100, F[i * 4 + 2] / 100), age = (T - F[i * 4]) / 24;
+      ctx.fillStyle = `rgba(255,${120 + 60 * (1 - age) | 0},40,${0.85 - 0.5 * age})`;
+      ctx.beginPath(); ctx.arc(p.x, p.y, z * Math.min(4, 1.2 + Math.sqrt(F[i * 4 + 3]) / 3), 0, 7); ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over";
+  }
+  if (layers.path) {
+    const pts = backPath(T).map(p => px(p[0], p[1]));
+    for (const [w, col] of [[5, "#000a"], [2, "#7fe0ff"]]) {
+      ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineJoin = "round"; ctx.beginPath();
+      pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke();
+    }
+    ctx.fillStyle = "#7fe0ff"; ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5; ctx.font = "11px system-ui"; ctx.textBaseline = "middle";
+    pts.forEach((p, i) => {
+      if (i && i % 12 === 0) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, 7); ctx.fill(); ctx.stroke();
+        ctx.strokeText(`${i} h ago`, p.x + 7, p.y); ctx.fillText(`${i} h ago`, p.x + 7, p.y);
+      }
+    });
+  }
+  if (layers.meters) {
+    D.stations.forEach((s, i) => {
+      const v = D.st[i][T], p = px(s.lat, s.lon);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 7);
+      ctx.fillStyle = pmCSS(v); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#1a1a19"; ctx.stroke();
+    });
+  }
+  const d = px(DELHI[0], DELHI[1]);
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(d.x, d.y, 26, 0, 7); ctx.stroke();
+  ctx.font = "600 12px system-ui"; ctx.textBaseline = "alphabetic"; ctx.lineWidth = 3; ctx.strokeStyle = "#000";
+  ctx.strokeText("Delhi", d.x + 30, d.y + 4); ctx.fillStyle = "#fff"; ctx.fillText("Delhi", d.x + 30, d.y + 4);
+}
+
+// wind particles
+let parts = [];
+function resetWind() {
+  const r = sizeCanvas(wcv); wctx.clearRect(0, 0, r.width, r.height);
+  parts = Array.from({ length: 700 }, newPart);
+}
+function newPart() {
+  const g = D ? D.wind : { lat0: 26, lon0: 72, d: 1, ny: 8, nx: 9 };
+  return { lat: g.lat0 + Math.random() * (g.ny - 1) * g.d, lon: g.lon0 + Math.random() * (g.nx - 1) * g.d, age: Math.random() * 90 | 0 };
+}
+function drawWind() {
+  if (!D || !layers.wind) return;
+  const w = wcv.clientWidth, h = wcv.clientHeight;
+  if (reduceMotion) { // no motion: plain arrows on the grid
+    wctx.clearRect(0, 0, w, h); wctx.strokeStyle = "#fffb"; wctx.lineWidth = 1.5;
+    const g = D.wind;
+    for (let y = 0; y < g.ny; y++) for (let x = 0; x < g.nx; x++) {
+      const i = T * g.ny * g.nx + y * g.nx + x, p = px(g.lat0 + y * g.d, g.lon0 + x * g.d), u = g.u[i], v = -g.v[i];
+      wctx.beginPath(); wctx.moveTo(p.x, p.y); wctx.lineTo(p.x + u, p.y + v); wctx.stroke();
+      wctx.beginPath(); wctx.arc(p.x + u, p.y + v, 2, 0, 7); wctx.stroke();
+    }
+    return;
+  }
+  wctx.globalCompositeOperation = "destination-out"; wctx.fillStyle = "rgba(0,0,0,0.07)"; wctx.fillRect(0, 0, w, h);
+  wctx.globalCompositeOperation = "source-over"; wctx.lineWidth = 1.1; wctx.strokeStyle = "rgba(255,255,255,0.55)";
+  const step = 0.9 * Math.pow(2, 7 - map.getZoom()); // km per frame per (km/h): keeps screen speed the same at each zoom
+  wctx.beginPath();
+  for (const p of parts) {
+    const u = bilinear(D.wind, D.wind.u, T, p.lat, p.lon), v = bilinear(D.wind, D.wind.v, T, p.lat, p.lon);
+    if (u == null || p.age++ > 110) { Object.assign(p, newPart(), { age: 0 }); continue; }
+    const a = px(p.lat, p.lon);
+    p.lat += v * step * 0.04 / 111; p.lon += u * step * 0.04 / (111 * Math.cos(p.lat * Math.PI / 180));
+    const b = px(p.lat, p.lon);
+    wctx.moveTo(a.x, a.y); wctx.lineTo(b.x, b.y);
+  }
+  wctx.stroke();
+}
+map.on("move zoomend resize", () => { resetWind(); drawMap(); });
+
+// meter tooltip on the map
+map.on("mousemove", e => {
+  const tip = $("#tip");
+  if (!D || !layers.meters) return tip.style.display = "none";
+  let best = null, bd = 12;
+  D.stations.forEach((s, i) => { const p = px(s.lat, s.lon), d = Math.hypot(p.x - e.containerPoint.x, p.y - e.containerPoint.y); if (d < bd) { bd = d; best = i; } });
+  if (best == null) return tip.style.display = "none";
+  const v = D.st[best][T];
+  tip.textContent = `${D.stations[best].name}: ${v == null ? "no data" : nf(v) + " µg/m³"}`;
+  tip.style.display = "block"; tip.style.left = e.containerPoint.x + 12 + "px"; tip.style.top = e.containerPoint.y - 10 + "px";
+});
+map.on("mouseout", () => $("#tip").style.display = "none");
+
+// ---------- time ----------
+const stamp = t => new Date(Date.UTC(D.year, 9, 1) + t * 3600e3); // wall clock IST, kept in UTC fields
+const fmtDay = (t, o) => stamp(t).toLocaleDateString("en-GB", Object.assign({ timeZone: "UTC" }, o));
+const isoDay = t => stamp(t).toISOString().slice(0, 10);
+const tOf = iso => Math.round((Date.parse(iso + (iso.length === 10 ? "T00:00" : "") + ":00Z") - Date.UTC(D.year, 9, 1)) / 3600e3);
+
+function setT(t) {
+  T = Math.max(0, Math.min(D.n - 1, Math.round(t)));
+  $("#range").value = T;
+  const day = Math.floor(T / 24), diff = day - D.stats.diwaliDay, hh = String(T % 24).padStart(2, "0");
+  $("#clock").textContent = `${fmtDay(T, { weekday: "short", day: "numeric", month: "short", year: "numeric" })}, ${hh}:00`;
+  $("#rel").textContent = diff === 0 ? "Diwali day" : `${Math.abs(diff)} day${Math.abs(diff) > 1 ? "s" : ""} ${diff < 0 ? "before" : "after"} Diwali`;
+  const v = D.pm[T], a = D.aqi[T], m24 = D.pm24[T];
+  $("#pm").textContent = v == null ? "-" : nf(v);
+  $("#pm").style.color = pmCSS(v);
+  $("#needle").style.left = (v == null ? 0 : rampX(v)) + "%";
+  $("#aqi").textContent = a == null ? "no data" : a + (a >= 500 ? " (max)" : "");
+  $("#cat").textContent = m24 == null ? "-" : cat(m24); $("#cat").style.background = pmCSS(m24);
+  const wi = D.pmMax[T] == null ? -1 : D.st.findIndex(s => s[T] === D.pmMax[T]);
+  const cut = D.stats.source === "opencity" && D.pmMax[T] >= 1000;
+  $("#worst").textContent = wi < 0 ? "no data" : `${nf(D.pmMax[T])}${cut ? " or more" : ""}, ${D.stations[wi].name.split(",")[0]}`;
+  $("#nst").textContent = `${D.pmN[T]} of ${D.stations.length}`;
+  $("#model").textContent = D.pmGrid ? nf(bilinear(D.pmGrid, D.pmGrid.v, T, DELHI[0], DELHI[1])) + " µg/m³" : "no model";
+  const wd = D.delhi.wd[T], ws = D.delhi.ws[T];
+  $("#arrowg").setAttribute("transform", `rotate(${(wd + 180) % 360})`);
+  $("#wfrom").textContent = `${dirName(wd)} (${Math.round(wd)}°)`;
+  $("#wsp").textContent = `${ws.toFixed(1)} km/h`;
+  $("#blh").textContent = D.delhi.blh[T] == null ? "no data" : `${nf(D.delhi.blh[T])} m`;
+  $("#rain").textContent = `${(D.delhi.rain[T] || 0).toFixed(1)} mm`;
+  $("#f24").textContent = nf(fireStart[T + 1] - fireStart[Math.max(0, T - 23)]);
+  $("#fpath").textContent = nf(D.onPath[day]);
+  syncGibs(); drawMap(); drawTimeline();
+}
+
+// ---------- timeline (4 small charts, one shared time axis, each with its own scale) ----------
+const tlc = $("#tlc"), tctx = tlc.getContext("2d"), base = document.createElement("canvas");
+const ROWS = [
+  { key: "pm", h: 132, title: "PM2.5 at Delhi meters, µg/m³ per hour", short: "PM2.5, µg/m³", color: "--s-pm" },
+  { key: "fire", h: 58, title: "Fires that NASA VIIRS saw, per day (map area)", short: "Fires per day", color: "--s-fire" },
+  { key: "path", h: 58, title: "Fires on the path of Delhi's air, per day", short: "Fires on air path, per day", color: "--s-path" },
+  { key: "wind", h: 46, title: "Wind speed at Delhi, km/h (10 m)", short: "Wind at Delhi, km/h", color: "--s-wind" },
+];
+const ML = 46, MR = 14, GAP = 22, AXIS = 20;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let TW = 0;
+const xOf = t => ML + t / (D.n - 1) * (TW - ML - MR);
+const tAt = x => (x - ML) / (TW - ML - MR) * (D.n - 1);
+const nice = m => { const p = Math.pow(10, Math.floor(Math.log10(m))); return [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find(f => f * p >= m) * p; };
+
+function buildTimeline() {
+  const height = ROWS.reduce((a, r) => a + r.h + GAP, 0) + AXIS;
+  tlc.style.height = height + "px";
+  const r = sizeCanvas(tlc); TW = r.width;
+  base.width = tlc.width; base.height = tlc.height;
+  const c = base.getContext("2d"), dpr = devicePixelRatio || 1;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = css("--page"); c.fillRect(0, 0, TW, height);
+  const dw = (TW - ML - MR) / (D.n - 1) * 24, dd = D.stats.diwaliDay;
+  let y = 0;
+  for (const row of ROWS) {
+    const top = y + GAP, bot = top + row.h, col = css(row.color);
+    const series = row.key === "pm" ? D.pm : row.key === "fire" ? D.fireDaily : row.key === "path" ? D.onPath : D.delhi.ws;
+    const max = nice(Math.max(1, ...(row.key === "pm" ? D.pmMax : series).filter(v => v != null)));
+    const yv = v => bot - v / max * row.h;
+    row.top = top; row.bot = bot;
+    c.fillStyle = css("--ink2"); c.font = "600 12px system-ui"; c.textAlign = "left"; c.textBaseline = "alphabetic";
+    const narrow = TW < 700, title = narrow ? row.short : row.title;
+    c.fillText(title, ML, top - 7);
+    c.fillStyle = css("--diwali") + "44"; c.fillRect(xOf(dd * 24), top, dw, row.h); // Diwali day band
+    c.strokeStyle = css("--grid"); c.lineWidth = 1; c.fillStyle = css("--muted"); c.font = "11px system-ui"; c.textAlign = "right"; c.textBaseline = "middle";
+    for (const v of [0, max / 2, max]) {
+      c.beginPath(); c.moveTo(ML, Math.round(yv(v)) + .5); c.lineTo(TW - MR, Math.round(yv(v)) + .5); c.stroke();
+      c.fillText(nf(v), ML - 6, yv(v));
+    }
+    if (row.key === "pm") {
+      c.strokeStyle = css("--muted"); c.lineWidth = 1; c.beginPath(); // worst single meter, thin
+      let pen = false;
+      D.pmMax.forEach((v, t) => { if (v == null) return pen = false; pen ? c.lineTo(xOf(t), yv(v)) : c.moveTo(xOf(t), yv(v)); pen = true; });
+      c.stroke();
+      c.strokeStyle = col; c.lineWidth = 2; c.lineJoin = "round"; c.beginPath(); pen = false;
+      D.pm.forEach((v, t) => { if (v == null) return pen = false; pen ? c.lineTo(xOf(t), yv(v)) : c.moveTo(xOf(t), yv(v)); pen = true; });
+      c.stroke();
+      // legend: two series, so the key is always there
+      let lx = ML + c.measureText(title).width + (narrow ? 16 : 60);
+      c.textAlign = "left"; c.font = "12px system-ui";
+      for (const [lab, lc, lw] of [[narrow ? "mean" : "city mean", col, 2], [narrow ? "worst meter" : "worst single meter", css("--muted"), 1]]) {
+        c.strokeStyle = lc; c.lineWidth = lw; c.beginPath(); c.moveTo(lx, top - 11); c.lineTo(lx + 18, top - 11); c.stroke();
+        c.fillStyle = css("--ink2"); c.fillText(lab, lx + 24, top - 11); lx += 34 + c.measureText(lab).width + 14;
+      }
+      c.font = "600 11px system-ui"; c.textAlign = "left"; c.textBaseline = "top";
+      c.fillStyle = css("--ink"); c.fillText("Diwali", xOf(dd * 24) + dw + 4, top + 3);
+    } else if (row.key === "wind") {
+      c.strokeStyle = col; c.lineWidth = 1.5; c.beginPath();
+      series.forEach((v, t) => t ? c.lineTo(xOf(t), yv(v)) : c.moveTo(xOf(t), yv(v))); c.stroke();
+    } else {
+      c.fillStyle = col;
+      series.forEach((v, d) => { const hgt = v / max * row.h; if (hgt > 0) c.fillRect(xOf(d * 24) + 1, bot - hgt, Math.max(1, dw - 2), hgt); });
+    }
+    y = bot;
+  }
+  c.fillStyle = css("--muted"); c.font = "11px system-ui"; c.textAlign = "center"; c.textBaseline = "top";
+  c.strokeStyle = css("--axis");
+  for (let d = 0; d < D.n / 24; d++) {
+    const date = stamp(d * 24).getUTCDate();
+    if (date === 1 || date % 5 === 0 && date < 30) {
+      c.beginPath(); c.moveTo(xOf(d * 24) + .5, y); c.lineTo(xOf(d * 24) + .5, y + 4); c.stroke();
+      c.fillText(fmtDay(d * 24, { day: "numeric", month: "short" }), xOf(d * 24), y + 6);
+    }
+  }
+  drawTimeline();
+}
+function drawTimeline() {
+  if (!TW) return;
+  const dpr = devicePixelRatio || 1;
+  tctx.setTransform(1, 0, 0, 1, 0, 0); tctx.drawImage(base, 0, 0); tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const bot = ROWS[ROWS.length - 1].bot, line = (t, col, w) => { tctx.strokeStyle = col; tctx.lineWidth = w; tctx.beginPath(); tctx.moveTo(xOf(t), ROWS[0].top); tctx.lineTo(xOf(t), bot); tctx.stroke(); };
+  if (hoverT != null) line(hoverT, "#fff5", 1);
+  line(T, "#fff", 1.5);
+  tctx.fillStyle = "#fff"; tctx.beginPath(); tctx.arc(xOf(T), ROWS[0].top, 4, 0, 7); tctx.fill();
+}
+function tlPoint(e) { const r = tlc.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+tlc.addEventListener("pointerdown", e => { tlc.setPointerCapture(e.pointerId); setPlaying(false); setT(tAt(tlPoint(e)[0])); });
+tlc.addEventListener("pointermove", e => {
+  if (!D) return;
+  const [x, y] = tlPoint(e), t = Math.max(0, Math.min(D.n - 1, Math.round(tAt(x))));
+  if (e.buttons) return setT(t);
+  hoverT = t; drawTimeline();
+  const tt = $("#ttip"), day = Math.floor(t / 24);
+  tt.textContent = `${fmtDay(t, { day: "numeric", month: "short" })} ${String(t % 24).padStart(2, "0")}:00 | PM2.5 ${nf(D.pm[t])} | worst meter ${nf(D.pmMax[t])} | fires ${nf(D.fireDaily[day])} | on path ${nf(D.onPath[day])} | wind ${D.delhi.ws[t].toFixed(0)} km/h`;
+  tt.style.display = "block";
+  tt.style.left = Math.min(x + 12, TW - tt.offsetWidth - 4) + "px"; tt.style.top = Math.max(34, y + 16 + $(".ctl").offsetHeight) + "px";
+});
+tlc.addEventListener("pointerleave", () => { hoverT = null; $("#ttip").style.display = "none"; drawTimeline(); });
+addEventListener("keydown", e => {
+  if (!D || /INPUT|SELECT|BUTTON/.test(e.target.tagName)) return;
+  const k = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+  if (k) { setT(T + k * (e.shiftKey ? 24 : 1)); e.preventDefault(); }
+  if (e.key === " ") { setPlaying(!playing); e.preventDefault(); }
+});
+$("#range").addEventListener("input", e => { setPlaying(false); setT(+e.target.value); });
+function setPlaying(p) { playing = p; $("#play").innerHTML = p ? "&#10074;&#10074; Pause" : "&#9654; Play"; }
+$("#play").onclick = () => { if (!playing && T >= D.n - 1) setT(0); setPlaying(!playing); };
+document.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => {
+  setPlaying(false);
+  const s = D.stats, j = b.dataset.jump;
+  setT(j === "diwali" ? tOf(s.peakTime || D.diwali) : j === "fire" ? tOf(s.firePeakDay) + 14 : tOf(s.worstDay) + 9);
+});
+let last = 0, acc = 0;
+function frame(ts) {
+  const dt = Math.min(0.2, (ts - last) / 1000); last = ts;
+  if (playing && D) {
+    acc += dt * +$("#speed").value;
+    if (acc >= 1) { const s = Math.floor(acc); acc -= s; if (T + s >= D.n - 1) { setT(D.n - 1); setPlaying(false); } else setT(T + s); }
+  }
+  drawWind();
+  requestAnimationFrame(frame);
+}
+
+// ---------- findings ----------
+const S = window.AQI_SUMMARY || {};
+const dmy = iso => new Date(iso.slice(0, 10) + "T00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+const rel = n => n === 0 ? "on Diwali day" : `${Math.abs(n)} day${Math.abs(n) > 1 ? "s" : ""} ${n < 0 ? "before" : "after"} Diwali`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function card(title, num, html) { return `<div class="card"><h3>${title}</h3><div class="num">${num}</div><p>${html}</p></div>`; }
+
+function renderCompare() {
+  const rows = YEARS.filter(y => S[y]).map(y => {
+    const s = S[y];
+    if (s.peak == null) return `<tr><td>${y}</td><td>${dmy(s.diwali)}</td><td>${s.stations}</td><td colspan="6">Diwali meter data is not out yet (last meter day: ${dmy(s.lastMeterDay)})</td><td>${dmy(s.firePeakDay)} so far</td><td>${dmy(s.worstDay)}: ${nf(s.worstDayPm)} so far</td><td>-</td><td>${s.corr.pm_onPath ?? "-"}</td><td>${s.corr.pm_wind ?? "-"}</td></tr>`;
+    return `<tr><td>${y}</td><td>${dmy(s.diwali)}</td><td>${s.stations}${s.source === "opencity" ? " (cut at 1000)" : ""}</td><td>${nf(s.prevNightsMean)}</td><td>${nf(s.nightMean)}</td><td>${nf(s.peak)}${s.source === "opencity" ? " or more" : ""} at ${(s.peakTime || "").slice(11)}${s.nightGapHours >= 3 ? ` (${s.nightGapHours} h of the night have no data)` : ""}</td><td>${nf(s.stationPeak)}${s.source === "opencity" ? " or more" : ""}</td><td>${s.hoursBack == null ? "more than 120" : s.hoursBack}</td><td>${nf(s.dayBefore)} / ${nf(s.dayAfter)}</td><td>${dmy(s.firePeakDay)} (${rel(s.firePeakFromDiwali)})</td><td>${dmy(s.worstDay)}: ${nf(s.worstDayPm)} (${rel(s.worstDayFromDiwali)})</td><td>${s.severeNearDiwali} of ${s.severeDays}</td><td>${s.corr.pm_onPath ?? "-"}</td><td>${s.corr.pm_wind ?? "-"}</td></tr>`;
+  }).join("");
+  $("#cmp").innerHTML = `<thead><tr><th>Year</th><th>Diwali</th><th>Meters</th><th>3 nights before, 20:00 to 04:00</th><th>Diwali night, 20:00 to 04:00</th><th>Peak hour, city mean</th><th>Peak hour, worst meter</th><th>Hours from peak back to the before level</th><th>Day mean: day before / day after</th><th>Fire peak day</th><th>Worst day of the season</th><th>Days over 250 that are within 2 days after Diwali</th><th>Rank link: PM2.5 and fires on air path</th><th>Rank link: PM2.5 and wind speed</th></tr></thead><tbody>${rows}</tbody>`;
+}
+const SRC = {
+  openaq: n => `${n} meters (CPCB, DPCC, IMD) from the OpenAQ archive.`,
+  opencity: n => `${n} meters from the CPCB repository copy at OpenCity. This copy has no readings of 1000 or more. We show those hours as 1000. The true values are higher.`,
+  embassy: () => `1 meter only: US Embassy, New Delhi. We found no open hourly PM2.5 data for the other meters in this year.`,
+};
+function renderYear() {
+  const s = D.stats, y = D.year;
+  $("#srcnote").textContent = SRC[s.source](s.stations);
+  $("#firesat").textContent = s.fireSat;
+  const part = s.days < 61, pending = s.peak == null, soFar = part ? ` (season so far, to ${dmy(s.lastDay)})` : "";
+  $("#yrhead").textContent = `${y}: Diwali on ${dmy(D.diwali)}${soFar}`;
+  $("#yearcards").innerHTML =
+    (pending ? card("Diwali night spike", "no meter data yet", `The meter archive (OpenAQ) gives each day about 3 days late. The last day with meter data is <strong>${dmy(s.lastMeterDay)}</strong>. Fire and wind data go to ${dmy(s.lastDay)}. To fill this in, run <code>python fetch_data.py</code> again 5 days or more after Diwali.`) : "") +
+    (pending ? "" : card("Diwali night spike", `${nf(s.prevNightsMean)} &rarr; ${nf(s.nightMean)} &micro;g/m&sup3;`, `Mean of the city meters from 20:00 to 04:00. Left: the 3 nights before. Right: Diwali night. The top hour was <strong>${nf(s.peak)}</strong> at ${esc((s.peakTime || "").slice(11))}. The worst single meter read <strong>${nf(s.stationPeak)}${s.source === "opencity" ? " or more" : ""}</strong> (${esc(s.stationPeakName || "")}).${s.nightGapHours ? ` <strong>Caution:</strong> ${s.nightGapHours} of the 9 night hours have no data, so the true top is not known.` : ""}${s.source === "opencity" ? " <strong>Caution:</strong> this source has no readings of 1000 or more, so the true top is higher." : ""}`) +
+    card("How long the spike stays", s.hoursBack == null ? "more than 5 days" : `${s.hoursBack} hours`, `Time from the top hour until the city mean is back at the level of the 24 hours before Diwali evening (${nf(s.before24)} &micro;g/m&sup3;). Day mean: ${nf(s.dayBefore)} the day before, ${nf(s.diwaliDayMean)} on Diwali, ${nf(s.dayAfter)} the day after, ${nf(s.day2After)} two days after.`)) +
+    card("Fires" + (part ? " so far" : ""), `${nf(s.fireTotal)} seen`, `Peak day: <strong>${dmy(s.firePeakDay)}</strong> with ${nf(s.firePeakCount)} fires, ${rel(s.firePeakFromDiwali)}. ${Math.round(s.fireBeforeDiwaliShare * 100)}% of the season's fires came before Diwali. Fires on the path of Delhi's air: ${nf(s.onPathDiwali)} on Diwali day, ${nf(s.onPathDayAfter)} the day after.`) +
+    card("Worst day of the season" + (part ? " so far" : ""), `${dmy(s.worstDay)}: ${nf(s.worstDayPm)} &micro;g/m&sup3;`, `That is ${rel(s.worstDayFromDiwali)}. Days with a day mean over 250: <strong>${s.severeDays}</strong>. Of these, ${s.severeNearDiwali} are on Diwali or the 2 days after.`);
+  $("#tophead").textContent = `${y}: the 10 worst days of the season (day mean PM2.5)`;
+  $("#top").innerHTML = `<thead><tr><th>Date</th><th>PM2.5 day mean</th><th>From Diwali</th><th>Fires on air path</th><th>Upwind fires, day before</th><th>Wind, km/h</th><th>Air lid height, m</th></tr></thead><tbody>` +
+    s.topDays.map(d => `<tr><td>${dmy(d.date)}</td><td>${nf(d.pm)}</td><td>${d.fromDiwali === 0 ? "Diwali" : (d.fromDiwali > 0 ? "+" : "") + d.fromDiwali + " d"}</td><td>${nf(d.onPath)}</td><td>${nf(d.upwindFiresPrev)}</td><td>${d.wind ?? "-"}</td><td>${nf(d.blh)}</td></tr>`).join("") + "</tbody>";
+}
+function renderVerdict() {
+  const ys = YEARS.filter(y => S[y] && S[y].peak != null && S[y].days === 61); if (!ys.length) return; // full seasons with Diwali data only
+  const sum = k => ys.reduce((a, y) => a + S[y][k], 0);
+  const best = ys.reduce((a, y) => S[y].seasonStationPeak > S[a].seasonStationPeak ? y : a), b = S[best];
+  const bad = ys.flatMap(y => S[y].glitches).filter(g => g.value >= 3000);
+  const hrs = ys.map(y => S[y].hoursBack).filter(h => h != null && h < 48);
+  const P = S.pooled || {};
+  const per = f => ys.map(y => `${y}: ${f(S[y])}`).join(". ") + ".";
+  const cr = k => ys.map(y => S[y].corr[k]), rng = a => `${Math.min(...a)} to ${Math.max(...a)}`;
+  const slow = ys.filter(y => S[y].hoursBack == null || S[y].hoursBack >= 48);
+  $("#short").innerHTML = `The story is <strong>half true</strong>. Crackers make a very large spike on Diwali night, and the meters show it each year. But the spike is gone in about ${Math.min(...hrs)} to ${Math.max(...hrs)} hours in most years. The long bad spells in November come on other days. They fit with crop fires on the path of Delhi's air (rank link ${rng(cr("pm_onPath"))}). Slow wind also fits in some years, but not in all (rank link ${rng(cr("pm_wind"))}). Of ${sum("severeDays")} days over 250 &micro;g/m&sup3;, only ${sum("severeNearDiwali")} are on Diwali or the 2 days after.`;
+  $("#verdict").innerHTML =
+    card("1. Crackers: a real, large spike", `up to ${nf(Math.max(...ys.map(y => S[y].peak)))} &micro;g/m&sup3;`, `Top hour of the city mean on Diwali night. Night mean (20:00 to 04:00), the 3 nights before &rarr; Diwali night. ${per(s => `${nf(s.prevNightsMean)} &rarr; ${nf(s.nightMean)}`)} The fire smoke model does not show this spike. Only the city meters do. That is the cracker mark.`) +
+    card("2. But it is short", `${Math.min(...hrs)} to ${Math.max(...hrs)} hours`, `Time from the top hour until the city mean is back at the level before Diwali evening. ${per(s => s.hoursBack == null ? "more than 120 h" : s.hoursBack + " h")}${slow.map(y => ` In ${y} the air was much cleaner than usual on the day before Diwali (day mean ${nf(S[y].dayBefore)}). The days after stayed above that level, and there were ${nf(S[y].onPathDayAfter)} fires on the path of Delhi's air the day after.`).join("")}`) +
+    card("3. The number 3000", `top real reading: ${nf(b.seasonStationPeak)}`, `Hourly PM2.5 at ${esc(b.seasonStationPeakName)}, ${dmy(b.seasonStationPeakTime)} ${b.seasonStationPeakTime.slice(11)}. The Indian AQI cannot go above 500, so "AQI 3000" is not an official value. ${bad.length ? `Readings of 3000 or more in the data: ${bad.map(g => `${nf(g.value)} at ${esc(g.name)}, ${dmy(g.time)} ${g.time.slice(11)}, when the city median was ${nf(g.cityMedian)}`).join("; ")}. That is a faulty meter, not the air.` : "No reading of 3000 or more is in the data."}`) +
+    card("4. Long bad spells: fires plus slow wind", `${nf(P.pmLowFireThird)} vs ${nf(P.pmHighFireThird)} &micro;g/m&sup3;`, `Day mean PM2.5 on the third of days with the fewest fires on the path of Delhi's air, against the third with the most. Diwali day and the day after are left out. ${P.days || ""} days, all years together.`) +
+    card("5. Very bad days near Diwali", `${sum("severeNearDiwali")} of ${sum("severeDays")}`, `Days with a day mean over 250 &micro;g/m&sup3; that are on Diwali or the 2 days after. ${per(s => `${s.severeNearDiwali} of ${s.severeDays}`)} The other days have no crackers.`) +
+    card("6. Weight in the full season", `+${nf(Math.min(...ys.map(y => S[y].seasonMean - S[y].seasonMeanNoDiwali)))} to +${nf(Math.max(...ys.map(y => S[y].seasonMean - S[y].seasonMeanNoDiwali)))} &micro;g/m&sup3;`, `What Diwali day and the day after add to the mean of the full 61 days. Mean without them &rarr; mean with them. ${per(s => `${nf(s.seasonMeanNoDiwali)} &rarr; ${nf(s.seasonMean)}`)}`);
+}
+
+// ---------- start ----------
+$("#ramp").style.background = $("#meter").style.background = "linear-gradient(90deg," + STOPS.map(s => `rgb(${s[1].join(",")}) ${rampX(s[0])}%`).join(",") + ")";
+$("#ramplab").innerHTML = [0, 60, 250, 500, 1000].map(v => `<span style="left:${rampX(v)}%">${v}</span>`).join("");
+$("#toggles").innerHTML = Object.keys(layers).map(k => `<label><input type="checkbox" data-layer="${k}" ${layers[k] ? "checked" : ""}>${LAYER_NAMES[k]}</label>`).join("");
+$("#toggles").addEventListener("change", e => {
+  const k = e.target.dataset.layer; layers[k] = e.target.checked;
+  if (k === "wind") resetWind();
+  syncGibs(); drawMap();
+});
+$("#years").innerHTML = YEARS.map(y => `<button role="tab" data-year="${y}" aria-selected="false">${y}</button>`).join("");
+$("#years").addEventListener("click", e => e.target.dataset.year && loadYear(+e.target.dataset.year));
+
+function loadYear(y) {
+  setPlaying(false);
+  $("#loading").style.display = "grid"; $("#loading").textContent = `Loading ${y}...`;
+  document.querySelectorAll("#years button").forEach(b => b.setAttribute("aria-selected", b.dataset.year == y));
+  const ready = () => {
+    D = window.AQI_DATA[y];
+    fireStart = new Int32Array(D.n + 2); // fireStart[t] = index of the first fire at hour t or later
+    const F = D.fires, nF = F.length / 4;
+    for (let t = 0, i = 0; t <= D.n + 1; t++) { while (i < nF && F[i * 4] < t) i++; fireStart[t] = i; }
+    $("#range").max = D.n - 1;
+    $("#loading").style.display = "none";
+    resetWind(); buildTimeline(); renderYear();
+    setT(tOf(D.diwali) + 12);
+  };
+  if (window.AQI_DATA && window.AQI_DATA[y]) return ready();
+  const s = document.createElement("script"); s.src = `data/y${y}.js`; s.onload = ready;
+  s.onerror = () => $("#loading").textContent = `No data file for ${y}. Run: python fetch_data.py`;
+  document.head.appendChild(s);
+}
+addEventListener("resize", () => { $("#ttip").style.display = "none"; if (D) { buildTimeline(); drawMap(); } });
+renderCompare(); renderVerdict();
+loadYear(YEARS.filter(y => S[y] && S[y].peak != null).pop() || YEARS[YEARS.length - 1]); // newest year that has Diwali meter data
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

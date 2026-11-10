@@ -1,0 +1,6 @@
+# The site is index.html + data/. Keep the build tools off the public site.
+raw/
+fetch_data.py
+stations.json
+.claude/
+__pycache__/

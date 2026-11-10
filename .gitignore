@@ -1,0 +1,4 @@
+# download cache, rebuilt by fetch_data.py
+raw/
+__pycache__/
+.vercel/

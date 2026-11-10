@@ -1,0 +1,324 @@
+[
+ {
+  "name": "Delhi Technological University, Delhi - CPCB",
+  "lat": 28.744,
+  "lon": 77.12,
+  "openaq": 13,
+  "opencity": null
+ },
+ {
+  "name": "R K Puram, Delhi - DPCC",
+  "lat": 28.5633,
+  "lon": 77.1869,
+  "openaq": 17,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/d9dfd28d-038d-448f-8e33-5e6f6b32d15c/download/del-r-k-puram-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Punjabi Bagh, Delhi - DPCC",
+  "lat": 28.674,
+  "lon": 77.131,
+  "openaq": 50,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/82080ddc-e094-4a3a-8421-242ec6bc8a45/download/del-punjabi-bagh-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Income Tax Office, Delhi - CPCB",
+  "lat": 28.6235,
+  "lon": 77.2494,
+  "openaq": 103,
+  "opencity": null
+ },
+ {
+  "name": "Anand Vihar, New Delhi - DPCC",
+  "lat": 28.6468,
+  "lon": 77.316,
+  "openaq": 235,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/5ef3f66f-2bb0-4593-91db-ba6e693a77f3/download/del-anand-vihar-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Mandir Marg, Delhi - DPCC",
+  "lat": 28.6341,
+  "lon": 77.2005,
+  "openaq": 236,
+  "opencity": null
+ },
+ {
+  "name": "IHBAS, Delhi - CPCB",
+  "lat": 28.6821,
+  "lon": 77.305,
+  "openaq": 431,
+  "opencity": null
+ },
+ {
+  "name": "Shadipur, Delhi - CPCB",
+  "lat": 28.6517,
+  "lon": 77.1581,
+  "openaq": 2503,
+  "opencity": null
+ },
+ {
+  "name": "NSIT Dwarka, Delhi - CPCB",
+  "lat": 28.591,
+  "lon": 77.05,
+  "openaq": 2584,
+  "opencity": null
+ },
+ {
+  "name": "Pusa, Delhi - IMD",
+  "lat": 28.6396,
+  "lon": 77.1463,
+  "openaq": 5404,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/48881f84-b60b-4178-939e-0a0d1051be11/download/del-pusa-imd-2024-25.csv"
+ },
+ {
+  "name": "Burari Crossing, New Delhi - IMD",
+  "lat": 28.7257,
+  "lon": 77.2012,
+  "openaq": 5541,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/9fee9210-33ec-4dfd-b230-b8d677bf81f3/download/del-burari-crossing-imd-2024-25.csv"
+ },
+ {
+  "name": "Aya Nagar, New Delhi - IMD",
+  "lat": 28.4743,
+  "lon": 77.1316,
+  "openaq": 5570,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/b64a05dc-a327-4f10-9f77-685b1fd59f0f/download/del-aya-nagar-imd-2024-25.csv"
+ },
+ {
+  "name": "Sirifort, Delhi - CPCB",
+  "lat": 28.5504,
+  "lon": 77.2159,
+  "openaq": 5586,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/e562d0c9-cc37-4d5a-a04e-fd95ee9f2f04/download/del-sirifort-cpcb-2024-25.csv"
+ },
+ {
+  "name": "North Campus, DU, Delhi - IMD",
+  "lat": 28.6574,
+  "lon": 77.1585,
+  "openaq": 5610,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/b3561bac-73ff-4048-8a84-4e1eba5953d1/download/del-north-campus-imd-2024-25.csv"
+ },
+ {
+  "name": "ITO, New Delhi - CPCB",
+  "lat": 28.6286,
+  "lon": 77.2411,
+  "openaq": 5613,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/890f786d-fb9f-475e-8516-191bfa1b01ea/download/del-ito-cpcb-2024-25.csv"
+ },
+ {
+  "name": "NSIT Dwarka, Delhi - CPCB",
+  "lat": 28.6091,
+  "lon": 77.0325,
+  "openaq": 5622,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/f7d16626-68d5-4de3-b6e6-e6a1b8831db3/download/del-nsit-dwarka-cpcb-2024-25.csv"
+ },
+ {
+  "name": "DTU, New Delhi - CPCB",
+  "lat": 28.75,
+  "lon": 77.1113,
+  "openaq": 5626,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/3abd2c56-3523-4802-8633-f37055d3b276/download/del-dtu-cpcb-2024-25.csv"
+ },
+ {
+  "name": "CRRI Mathura Road, New Delhi - IMD",
+  "lat": 28.5512,
+  "lon": 77.2736,
+  "openaq": 5627,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/c4ec16f3-edfc-465e-8fb8-5bfaa14f8baa/download/del-crri-mathura-road-imd-2024-25.csv"
+ },
+ {
+  "name": "Shadipur, Delhi - CPCB",
+  "lat": 28.6515,
+  "lon": 77.1473,
+  "openaq": 5630,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/e91c68ea-85ac-49f8-8015-dd8b04c32a71/download/del-shadipur-cpcb-2024-25.csv"
+ },
+ {
+  "name": "Lodhi Road, New Delhi - IMD",
+  "lat": 28.5918,
+  "lon": 77.2273,
+  "openaq": 5634,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/1731db44-1f8c-4959-a408-b3d38641eb98/download/del-lodhi-road-imd-2024-25.csv"
+ },
+ {
+  "name": "IGI Airport (T3), Delhi - IMD",
+  "lat": 28.5628,
+  "lon": 77.118,
+  "openaq": 5650,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/ea589978-8578-4c94-953f-6ba64a810e64/download/del-igi-airport-t3-imd-2024-25.csv"
+ },
+ {
+  "name": "Pusa, Delhi - DPCC",
+  "lat": 28.6396,
+  "lon": 77.1463,
+  "openaq": 6356,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/24298b91-40d8-4d9d-a652-c8acb6602136/download/del-pusa-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Mandir Marg, New Delhi - DPCC",
+  "lat": 28.6364,
+  "lon": 77.2011,
+  "openaq": 6358,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/922c72d8-c66e-4336-8cd9-49898776ca69/download/del-mandir-marg-dpcc-2024-25.csv"
+ },
+ {
+  "name": "IHBAS, Dilshad Garden,New Delhi - CPCB",
+  "lat": 28.6812,
+  "lon": 77.3025,
+  "openaq": 6359,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/4cc723ba-bbd1-459f-b4b6-658107defa65/download/del-ihbas-cpcb-2024-25.csv"
+ },
+ {
+  "name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+  "lat": 28.6113,
+  "lon": 77.2377,
+  "openaq": 6929,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/b3f4e17b-8767-4c48-99cf-3eea8e7be030/download/del-major-dhyan-chand-national-stadium-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Dwarka-Sector 8, Delhi - DPCC",
+  "lat": 28.571,
+  "lon": 77.0719,
+  "openaq": 6931,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/495db3d4-5683-4b1d-9b7d-34ecb887ca13/download/del-dwarka-sector-8-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Alipur, Delhi - DPCC",
+  "lat": 28.8153,
+  "lon": 77.153,
+  "openaq": 6932,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/bf15420f-f44d-468a-87fc-499a4da4ec2d/download/del-alipur-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+  "lat": 28.4986,
+  "lon": 77.2648,
+  "openaq": 6934,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/97adf51a-bf80-4a08-b338-6f9936ad4ef1/download/del-dr-2024-25.csv"
+ },
+ {
+  "name": "Vivek Vihar, Delhi - DPCC",
+  "lat": 28.6723,
+  "lon": 77.3153,
+  "openaq": 6938,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/19172e66-45d4-4d3c-8736-e573b160fe99/download/del-vivek-vihar-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+  "lat": 28.5803,
+  "lon": 77.2338,
+  "openaq": 6957,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/d4b78e81-57ce-487c-a5f5-69c64880dd05/download/del-jawaharlal-nehru-stadium-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Patparganj, Delhi - DPCC",
+  "lat": 28.6237,
+  "lon": 77.2872,
+  "openaq": 6960,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/7d563edf-b8ee-4c61-83eb-baa73b12f79b/download/del-patparganj-dpcc-2024-25.csv"
+ },
+ {
+  "name": "US Embassy, New Delhi",
+  "lat": 28.6358,
+  "lon": 77.2245,
+  "openaq": 8118,
+  "opencity": null
+ },
+ {
+  "name": "Jahangirpuri, Delhi - DPCC",
+  "lat": 28.7328,
+  "lon": 77.1706,
+  "openaq": 8235,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/734c459f-3e47-44c7-b0b8-8270090cecf0/download/del-jahangirpuri-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Okhla Phase-2, Delhi - DPCC",
+  "lat": 28.5308,
+  "lon": 77.2713,
+  "openaq": 8239,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/7b03c3c3-c95e-4d09-b1a8-8951b96c05b6/download/del-okhla-phase-2-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Nehru Nagar, Delhi - DPCC",
+  "lat": 28.5679,
+  "lon": 77.2505,
+  "openaq": 8365,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/5ee93ef5-afe3-4cac-847d-f21cc4e8d67f/download/del-nehru-nagar-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Bawana, Delhi - DPCC",
+  "lat": 28.7762,
+  "lon": 77.0511,
+  "openaq": 8472,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/102d2fad-f2dd-41c5-b5a6-2db6c75b3712/download/del-bawana-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Sonia Vihar, Delhi - DPCC",
+  "lat": 28.7105,
+  "lon": 77.2495,
+  "openaq": 8475,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/d496427e-c92f-44f9-a415-d3c0778e0930/download/del-sonia-vihar-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Wazirpur, Delhi - DPCC",
+  "lat": 28.6998,
+  "lon": 77.1655,
+  "openaq": 8915,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/70bfe4b2-b869-4f1c-9c25-f4b768858c1c/download/del-wazirpur-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Ashok Vihar, Delhi - DPCC",
+  "lat": 28.6954,
+  "lon": 77.1817,
+  "openaq": 8917,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/73703a83-f321-4b60-8748-33fb046273e0/download/del-ashok-vihar-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Sri Aurobindo Marg, Delhi - DPCC",
+  "lat": 28.5313,
+  "lon": 77.1902,
+  "openaq": 10484,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/e42457e9-d117-4323-bdb9-bbf2a491922e/download/del-sri-aurobindo-marg-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Narela, Delhi - DPCC",
+  "lat": 28.8228,
+  "lon": 77.102,
+  "openaq": 10485,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/b87d0285-e677-403c-aa5d-9b9ab41386eb/download/del-narela-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Mundka, Delhi - DPCC",
+  "lat": 28.6847,
+  "lon": 77.0766,
+  "openaq": 10486,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/3fe46cce-659f-49a7-a743-090c2557cbfd/download/del-mundka-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Najafgarh, Delhi - DPCC",
+  "lat": 28.5702,
+  "lon": 76.9338,
+  "openaq": 10488,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/99054843-c5c1-4ebd-8557-dabf455f0e3b/download/del-najafgarh-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Rohini, Delhi - DPCC",
+  "lat": 28.7325,
+  "lon": 77.1199,
+  "openaq": 10831,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/f6be929b-151a-4b92-b5b4-507481b15128/download/del-rohini-dpcc-2024-25.csv"
+ },
+ {
+  "name": "Chandni Chowk, Delhi - IITM",
+  "lat": 28.6568,
+  "lon": 77.2272,
+  "openaq": 11603,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/61ec5645-c2cf-4890-9692-70b3924ed4d8/download/del-chandni-chowk-iitm-2024-25.csv"
+ },
+ {
+  "name": "Lodhi Road, Delhi - IITM",
+  "lat": 28.5883,
+  "lon": 77.2217,
+  "openaq": 11607,
+  "opencity": "https://data.opencity.in/dataset/0dc7b9fe-9fd4-46ee-a37e-88f0bd6f6362/resource/99a25262-def3-4898-9f63-a65c0bbeaecd/download/del-lodhi-road-iitm-2024-25.csv"
+ }
+]
