@@ -4,3 +4,4 @@ fetch_data.py
 stations.json
 .claude/
 __pycache__/
+.env*
