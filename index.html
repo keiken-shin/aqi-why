@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Delhi air at Diwali: crackers or crop fires?</title>
+<meta name="description" content="NASA fire data, wind and Delhi's ground PM2.5 meters on one timeline you can drag. The cracker story is half true.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aqi-why.vercel.app/">
+<meta property="og:title" content="Delhi air at Diwali: crackers or crop fires?">
+<meta property="og:description" content="NASA fire data, wind and Delhi's ground PM2.5 meters on one timeline you can drag. The cracker story is half true.">
+<meta property="og:image" content="https://aqi-why.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -435,6 +444,8 @@ function setT(t) {
   $("#rain").textContent = `${(D.delhi.rain[T] || 0).toFixed(1)} mm`;
   $("#f24").textContent = nf(fireStart[T + 1] - fireStart[Math.max(0, T - 23)]);
   $("#fpath").textContent = nf(D.onPath[day]);
+  // the address keeps the year and hour, so a link opens on this exact moment. Not while playing: browsers limit how often this may change.
+  if (!playing) try { history.replaceState(null, "", `#${D.year}/${T}`); } catch (e) {}
   syncGibs(); drawMap(); drawTimeline();
 }
 
@@ -544,7 +555,7 @@ addEventListener("keydown", e => {
   if (e.key === " ") { setPlaying(!playing); e.preventDefault(); }
 });
 $("#range").addEventListener("input", e => { setPlaying(false); setT(+e.target.value); });
-function setPlaying(p) { playing = p; $("#play").innerHTML = p ? "&#10074;&#10074; Pause" : "&#9654; Play"; }
+function setPlaying(p) { const was = playing; playing = p; $("#play").innerHTML = p ? "&#10074;&#10074; Pause" : "&#9654; Play"; if (was && !p && D) setT(T); }
 $("#play").onclick = () => { if (!playing && T >= D.n - 1) setT(0); setPlaying(!playing); };
 document.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => {
   setPlaying(false);
@@ -630,7 +641,7 @@ $("#toggles").addEventListener("change", e => {
 $("#years").innerHTML = YEARS.map(y => `<button role="tab" data-year="${y}" aria-selected="false">${y}</button>`).join("");
 $("#years").addEventListener("click", e => e.target.dataset.year && loadYear(+e.target.dataset.year));
 
-function loadYear(y) {
+function loadYear(y, t) {
   setPlaying(false);
   $("#loading").style.display = "grid"; $("#loading").textContent = `Loading ${y}...`;
   document.querySelectorAll("#years button").forEach(b => b.setAttribute("aria-selected", b.dataset.year == y));
@@ -642,7 +653,7 @@ function loadYear(y) {
     $("#range").max = D.n - 1;
     $("#loading").style.display = "none";
     resetWind(); buildTimeline(); renderYear();
-    setT(tOf(D.diwali) + 12);
+    setT(t ?? tOf(D.diwali) + 12);
   };
   if (window.AQI_DATA && window.AQI_DATA[y]) return ready();
   const s = document.createElement("script"); s.src = `data/y${y}.js`; s.onload = ready;
@@ -651,7 +662,9 @@ function loadYear(y) {
 }
 addEventListener("resize", () => { $("#ttip").style.display = "none"; if (D) { buildTimeline(); drawMap(); } });
 renderCompare(); renderVerdict();
-loadYear(YEARS.filter(y => S[y] && S[y].peak != null).pop() || YEARS[YEARS.length - 1]); // newest year that has Diwali meter data
+const link = location.hash.match(/^#(\d{4})\/(\d+)$/); // a shared link: #year/hour
+if (link && YEARS.includes(+link[1])) loadYear(+link[1], +link[2]);
+else loadYear(YEARS.filter(y => S[y] && S[y].peak != null).pop() || YEARS[YEARS.length - 1]); // newest year that has Diwali meter data
 requestAnimationFrame(frame);
 </script>
 </body>
