@@ -5,3 +5,4 @@ stations.json
 .claude/
 __pycache__/
 .env*
+promo-drafts.md

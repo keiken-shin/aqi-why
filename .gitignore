@@ -5,3 +5,6 @@ __pycache__/
 
 .vercel
 .env*
+
+# post drafts, not part of the site
+promo-drafts.md
